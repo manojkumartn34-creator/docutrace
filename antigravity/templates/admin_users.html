@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}User Management – DOCUTRACE{% endblock %}
+
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom: 2rem;">
+    <div>
+        <h1 style="font-size: 1.85rem; font-weight: 800; color:#fff;">👥 System User Management</h1>
+        <p style="color: var(--dark-muted); font-size: 0.95rem;">
+            Manage user accounts, assign roles, and inspect multi-user activity across DocuTrace.
+        </p>
+    </div>
+    <div style="display:flex; gap: 0.75rem;">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            ← Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- STATS SUMMARY -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-icon icon-blue">👥</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ users|length }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon icon-purple">📄</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ system_stats.total_documents }}</div>
+            <div class="stat-label">Documents Registered</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon icon-green">⛓️</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ system_stats.total_blocks }}</div>
+            <div class="stat-label">Blockchain Blocks</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon icon-amber">🌐</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ lan_ip }}</div>
+            <div class="stat-label">Server Network IP</div>
+        </div>
+    </div>
+</div>
+
+<!-- USERS LIST CARD -->
+<div class="card">
+    <div class="card-header" style="flex-wrap:wrap; gap:1rem;">
+        <h2 class="card-title">
+            <span>Registered System Accounts</span>
+            <span style="font-size:0.85rem; color:var(--dark-muted); font-weight:normal;">({{ users|length }} registered)</span>
+        </h2>
+    </div>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Username</th>
+                    <th>Email Address</th>
+                    <th>Role / Permissions</th>
+                    <th>Docs Issued</th>
+                    <th>Registered At</th>
+                    <th style="text-align: right;">Change Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td style="font-family:var(--font-mono); color:#9ca3af;">#{{ u.id }}</td>
+                    <td>
+                        <strong style="color:#fff;">{{ u.username }}</strong>
+                        {% if u.id == current_user.id %}
+                            <span class="badge-pill pill-info" style="font-size:0.65rem; margin-left:0.35rem;">You</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:#cbd5e1; font-size:0.875rem;">{{ u.email }}</td>
+                    <td>
+                        {% if u.role == 'admin' %}
+                            <span class="badge-pill pill-warning">👑 Administrator</span>
+                        {% elif u.role == 'issuer' %}
+                            <span class="badge-pill pill-info">🏛️ Document Issuer</span>
+                        {% else %}
+                            <span class="badge-pill pill-success">🔍 Verifier / User</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span style="font-weight:700; color:#38bdf8;">{{ u.doc_count }}</span> doc(s)
+                    </td>
+                    <td style="font-size:0.825rem; color:var(--dark-muted);">
+                        {{ u.created_at[:10] }}
+                    </td>
+                    <td style="text-align: right;">
+                        <form action="{{ url_for('admin_change_role', user_id=u.id) }}" method="POST" style="display:inline-flex; gap:0.35rem; align-items:center;">
+                            <select name="role" class="form-control" style="padding:0.25rem 0.5rem; font-size:0.8rem; width:auto;">
+                                <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Admin</option>
+                                <option value="issuer" {% if u.role == 'issuer' %}selected{% endif %}>Issuer</option>
+                                <option value="verifier" {% if u.role == 'verifier' or u.role == 'user' %}selected{% endif %}>Verifier</option>
+                            </select>
+                            <button type="submit" class="btn btn-secondary btn-sm" style="padding:0.3rem 0.65rem;">
+                                Update
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

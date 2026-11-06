@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account – DOCUTRACE{% endblock %}
+
+{% block content %}
+<div class="container-narrow" style="max-width: 480px; margin-top: 1.5rem;">
+    <div class="card">
+        <div class="card-header" style="text-align: center; display: block;">
+            <div style="font-size: 2.25rem; margin-bottom: 0.5rem;">📝</div>
+            <h2 class="card-title" style="justify-content: center; font-size: 1.45rem;">Create DocuTrace Account</h2>
+            <p style="color: var(--dark-muted); font-size: 0.85rem; margin-top: 0.25rem;">
+                Register to issue, sign, and manage verified digital documents
+            </p>
+        </div>
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="form-group">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Choose a username" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="name@institution.com" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="role">Account Type / Role</label>
+                <select id="role" name="role" class="form-control">
+                    <option value="issuer" selected>🏛️ Document Issuer (Institution, University, Organization)</option>
+                    <option value="verifier">🔍 General User / Verifier (Student, Recipient, Public)</option>
+                </select>
+                <div style="font-size: 0.775rem; color: var(--dark-muted); margin-top: 0.25rem;">
+                    Issuers can upload and sign documents; General users can view and verify authenticity.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="At least 6 characters" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Re-enter password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.5rem;">
+                Create Account
+            </button>
+        </form>
+
+        <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--dark-border); text-align: center; font-size: 0.875rem;">
+            <span style="color: var(--dark-muted);">Already registered?</span>
+            <a href="{{ url_for('login') }}" style="font-weight: 600; margin-left: 0.35rem;">Sign In</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

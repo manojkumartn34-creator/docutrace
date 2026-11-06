@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In – DOCUTRACE{% endblock %}
+
+{% block content %}
+<div class="container-narrow" style="max-width: 440px; margin-top: 2rem;">
+    <div class="card">
+        <div class="card-header" style="text-align: center; display: block;">
+            <div style="font-size: 2.25rem; margin-bottom: 0.5rem;">🔐</div>
+            <h2 class="card-title" style="justify-content: center; font-size: 1.45rem;">Sign In to DocuTrace</h2>
+            <p style="color: var(--dark-muted); font-size: 0.85rem; margin-top: 0.25rem;">
+                Access your authenticated documents and verification dashboard
+            </p>
+        </div>
+
+        <form method="POST" action="{{ url_for('login', next=request.args.get('next')) }}">
+            <div class="form-group">
+                <label class="form-label" for="identifier">Username or Email</label>
+                <input type="text" id="identifier" name="identifier" class="form-control" placeholder="Enter username or email" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.5rem;">
+                Sign In
+            </button>
+        </form>
+
+        <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--dark-border); text-align: center; font-size: 0.875rem;">
+            <span style="color: var(--dark-muted);">Don't have an account?</span>
+            <a href="{{ url_for('register') }}" style="font-weight: 600; margin-left: 0.35rem;">Register Here</a>
+        </div>
+
+        <div style="margin-top: 1rem; background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.25); border-radius: var(--radius-sm); padding: 0.75rem; font-size: 0.775rem; color: #93c5fd; text-align: center;">
+            💡 <strong>Administrator Login:</strong> Username: <code>manoj</code> | Password: <code>manoj9345</code>
+        </div>
+    </div>
+</div>
+{% endblock %}

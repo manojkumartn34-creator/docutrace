@@ -1,0 +1,22 @@
+================================================================================
+                     GLOBAL TECH SOLUTIONS PRIVATE LIMITED
+                         EXECUTIVE EMPLOYMENT AGREEMENT
+================================================================================
+
+This Agreement is made on this 1st day of January, 2026, by and between:
+Employer: Global Tech Solutions Pvt Ltd, Silicon Tower, Bangalore, India
+Employee: Manoj Kumar
+Role: Lead Software Architect
+
+Terms of Employment:
+1. Compensation: Annual fixed gross salary of INR 24,00,000.
+2. Confidentiality & Non-Disclosure: Strict adherence to company proprietary assets.
+3. Term: Indefinite full-time employment subject to standard notice period.
+
+Authorized Signatory:
+Managing Director: Rajesh Sharma
+Human Resources: Ananya Sen
+
+Document Tracking: GTS-HR-2026-90214
+Cryptographically Anchored on DocuTrace Ledger
+================================================================================

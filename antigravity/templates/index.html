@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Home – DOCUTRACE Document Verification & Authenticity Tracking{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<div style="text-align:center; padding: 3rem 1rem 2rem 1rem; max-width: 900px; margin: 0 auto;">
+    <div style="display:inline-block; padding: 0.35rem 1rem; border-radius: 9999px; background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.4); color: #60a5fa; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.25rem;">
+        🔒 Blockchain-Backed Document Integrity & Verification System
+    </div>
+    <h1 style="font-size: 2.75rem; font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin-bottom: 1.25rem; background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        DOCUTRACE – Document Verification & Authenticity Tracking System
+    </h1>
+    <p style="font-size: 1.15rem; color: #9ca3af; margin-bottom: 2rem; max-width: 750px; margin-left: auto; margin-right: auto;">
+        Eliminate document forgery and unauthorized changes. DocuTrace generates immutable SHA-256 digital fingerprints, commits records onto an auditable blockchain, and enables 1-click verification via dynamic QR codes.
+    </p>
+
+    <div style="display:flex; justify-content:center; gap: 1rem; flex-wrap: wrap;">
+        <a href="{{ url_for('verify') }}" class="btn btn-primary btn-lg">
+            🔍 Verify a Document Now
+        </a>
+        {% if current_user %}
+            <a href="{{ url_for('upload') }}" class="btn btn-secondary btn-lg">
+                📤 Upload & Register Document
+            </a>
+        {% else %}
+            <a href="{{ url_for('register') }}" class="btn btn-secondary btn-lg">
+                🚀 Create Free Account
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- LIVE STATS GRID -->
+<div class="stats-grid" style="margin-top: 2rem;">
+    <div class="stat-card">
+        <div class="stat-icon icon-blue">📄</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ system_stats.total_documents }}</div>
+            <div class="stat-label">Registered Documents</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon icon-purple">⛓️</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ system_stats.total_blocks }}</div>
+            <div class="stat-label">Blockchain Blocks</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon icon-green">🛡️</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ system_stats.verified_verifications }}</div>
+            <div class="stat-label">Authentic Verifications</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon icon-amber">👥</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ system_stats.total_users }}</div>
+            <div class="stat-label">System Users</div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN KEY FEATURES -->
+<div style="margin: 3.5rem 0;">
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+        <h2 style="font-size: 1.85rem; font-weight: 700; color:#fff;">Main Key Features</h2>
+        <p style="color: #9ca3af; font-size: 0.95rem;">Engineered with cutting-edge cryptography and resilient architecture</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+        <!-- Feature 1 -->
+        <div class="card">
+            <div style="font-size: 2rem; margin-bottom: 0.75rem;">🔐</div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Secure User Login & Registration</h3>
+            <p style="color: #9ca3af; font-size: 0.875rem;">
+                Protected access powered by salted PBKDF2 password hashing in SQLite. Dedicated user portals allow uploaders to manage their verified documents safely.
+            </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="card">
+            <div style="font-size: 2rem; margin-bottom: 0.75rem;">🧬</div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Document Upload & SHA-256 Hashing</h3>
+            <p style="color: #9ca3af; font-size: 0.875rem;">
+                Generates a unique 256-bit cryptographic digest of uploaded certificates, degrees, or contracts. Any 1-character modification alters the hash completely.
+            </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="card">
+            <div style="font-size: 2rem; margin-bottom: 0.75rem;">⛓️</div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Blockchain-Based Verification</h3>
+            <p style="color: #9ca3af; font-size: 0.875rem;">
+                Records document hashes onto an immutable chain of blocks with cryptographic proof-of-work, previous hash linkage, and permanent timestamping.
+            </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="card">
+            <div style="font-size: 2rem; margin-bottom: 0.75rem;">📱</div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">QR Code & Tamper Detection</h3>
+            <p style="color: #9ca3af; font-size: 0.875rem;">
+                Generates a scannable dynamic QR code for each document. Instant comparison against the blockchain flags altered, forged, or unauthenticated files.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- HOW IT WORKS STEP-BY-STEP -->
+<div class="card" style="margin-bottom: 3rem; background: rgba(17, 24, 39, 0.6);">
+    <div class="card-header">
+        <h3 class="card-title">⚙️ How DocuTrace Works</h3>
+        <span class="badge-pill pill-info">Workflow Process</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; text-align: center;">
+        <div style="padding: 1rem;">
+            <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; margin: 0 auto 1rem auto;">1</div>
+            <h4 style="color:#fff; margin-bottom: 0.35rem;">1. Upload & Hash</h4>
+            <p style="color:#9ca3af; font-size: 0.85rem;">Issuer uploads the digital document. The server computes its SHA-256 cryptographic fingerprint.</p>
+        </div>
+        <div style="padding: 1rem;">
+            <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; margin: 0 auto 1rem auto;">2</div>
+            <h4 style="color:#fff; margin-bottom: 0.35rem;">2. Mine & Stamp QR</h4>
+            <p style="color:#9ca3af; font-size: 0.85rem;">A new block is mined onto the blockchain ledger, and a unique QR code is created linking to the verification portal.</p>
+        </div>
+        <div style="padding: 1rem;">
+            <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--success); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; margin: 0 auto 1rem auto;">3</div>
+            <h4 style="color:#fff; margin-bottom: 0.35rem;">3. Instant Verification</h4>
+            <p style="color:#9ca3af; font-size: 0.85rem;">Verifier scans the QR code or uploads the document file. The hashes are compared to detect any alteration.</p>
+        </div>
+    </div>
+</div>
+
+<!-- QUICK VERIFY SEARCH -->
+<div class="card container-narrow" style="text-align: center; margin-bottom: 3rem;">
+    <h3 style="font-size: 1.35rem; color:#fff; margin-bottom: 0.5rem;">Have a Document ID to verify?</h3>
+    <p style="color:#9ca3af; font-size: 0.9rem; margin-bottom: 1.5rem;">Enter the unique tracking ID (e.g. DOC-2026-ABCDEF) printed on the document or QR code.</p>
+    
+    <form action="{{ url_for('verify') }}" method="POST" style="display:flex; gap:0.5rem; max-width: 500px; margin: 0 auto;">
+        <input type="hidden" name="verification_method" value="id">
+        <input type="text" name="doc_id" class="form-control" placeholder="Enter Document ID (e.g. DOC-2026-XXXXXX)" required>
+        <button type="submit" class="btn btn-primary">Verify</button>
+    </form>
+</div>
+{% endblock %}

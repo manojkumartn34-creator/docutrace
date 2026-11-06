@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard – DOCUTRACE{% endblock %}
+
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom: 2rem;">
+    <div>
+        <h1 style="font-size: 1.85rem; font-weight: 800; color:#fff;">Document Management Dashboard</h1>
+        <p style="color: var(--dark-muted); font-size: 0.95rem;">
+            Logged in as <strong>{{ current_user.username }}</strong> 
+            {% if is_admin %}
+                <span class="badge-pill pill-warning" style="margin-left:0.5rem;">👑 System Administrator (All Documents)</span>
+            {% elif current_user.role == 'issuer' %}
+                <span class="badge-pill pill-info" style="margin-left:0.5rem;">🏛️ Document Issuer / Institution</span>
+            {% else %}
+                <span class="badge-pill pill-success" style="margin-left:0.5rem;">🔍 General User / Verifier</span>
+            {% endif %}
+            {% if cloud_status and cloud_status.connected %}
+                <span class="badge-pill pill-success" style="margin-left:0.5rem;">☁️ Firebase Cloud Auth Active</span>
+            {% else %}
+                <span class="badge-pill pill-warning" style="margin-left:0.5rem;" title="{{ cloud_status.message }}">💾 Local SQLite Auth</span>
+            {% endif %}
+        </p>
+    </div>
+    <div style="display:flex; gap: 0.75rem;">
+        <a href="{{ url_for('upload') }}" class="btn btn-primary">
+            ➕ Upload New Document
+        </a>
+        <a href="{{ url_for('blockchain_explorer') }}" class="btn btn-secondary">
+            ⛓️ View Blockchain Ledger
+        </a>
+    </div>
+</div>
+
+<!-- STATS SUMMARY -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="stat-card">
+        <div class="stat-icon icon-blue">📑</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ documents|length }}</div>
+            <div class="stat-label">Active Documents</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon icon-purple">⛓️</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ system_stats.total_blocks }}</div>
+            <div class="stat-label">Total Blocks Mined</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon icon-green">🛡️</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ system_stats.verified_verifications }}</div>
+            <div class="stat-label">System Verifications</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon icon-amber">⚙️</div>
+        <div class="stat-info">
+            <div class="stat-value">SHA-256</div>
+            <div class="stat-label">Hashing Algorithm</div>
+        </div>
+    </div>
+</div>
+
+<!-- DOCUMENTS TABLE CARD -->
+<div class="card">
+    <div class="card-header" style="flex-wrap:wrap; gap:1rem;">
+        <h2 class="card-title">
+            <span>📋 Registered Digital Documents</span>
+            <span style="font-size:0.85rem; color:var(--dark-muted); font-weight:normal;">({{ documents|length }} total)</span>
+        </h2>
+        <div style="max-width: 320px; width: 100%;">
+            <input type="text" id="table-search-input" class="form-control" placeholder="🔍 Search by title, ID, or hash..." style="padding: 0.5rem 0.85rem; font-size:0.85rem;">
+        </div>
+    </div>
+
+    {% if documents %}
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Tracking ID</th>
+                    <th>Document Details</th>
+                    <th>Category</th>
+                    <th>SHA-256 Fingerprint</th>
+                    <th>Date Issued</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documents %}
+                <tr>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:0.4rem;">
+                            <a href="{{ url_for('document_detail', doc_id=doc.doc_id) }}" style="font-weight:700; font-family:var(--font-mono); color:#38bdf8;">
+                                {{ doc.doc_id }}
+                            </a>
+                            <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('{{ doc.doc_id }}', this)" title="Copy Tracking ID" style="padding:2px 6px; font-size:0.7rem;">
+                                📋
+                            </button>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-weight:600; color:#fff;">{{ doc.title }}</div>
+                        <div style="font-size:0.775rem; color:var(--dark-muted);">
+                            File: {{ doc.original_filename }} ({{ (doc.file_size / 1024)|round(1) }} KB)
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge-pill pill-info">{{ doc.category }}</span>
+                    </td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:0.4rem;">
+                            <span style="font-family:var(--font-mono); font-size:0.775rem; color:#9ca3af;" title="{{ doc.sha256_hash }}">
+                                {{ doc.sha256_hash[:12] }}...{{ doc.sha256_hash[-8:] }}
+                            </span>
+                            <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('{{ doc.sha256_hash }}', this)" title="Copy full SHA-256 hash" style="padding:2px 6px; font-size:0.7rem;">
+                                📋
+                            </button>
+                        </div>
+                    </td>
+                    <td style="font-size:0.85rem; color:var(--dark-muted);">
+                        {{ doc.created_at[:10] }}
+                    </td>
+                    <td>
+                        <span class="badge-pill pill-success">Authentic</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <div style="display:inline-flex; gap:0.35rem;">
+                            <a href="{{ url_for('document_detail', doc_id=doc.doc_id) }}" class="btn btn-secondary btn-sm" title="View Document & QR Code">
+                                🔍 Details
+                            </a>
+                            <a href="{{ url_for('download_file', doc_id=doc.doc_id) }}" class="btn btn-secondary btn-sm" title="Download File">
+                                ⬇️
+                            </a>
+                            <a href="{{ url_for('verify_direct', doc_id=doc.doc_id) }}" class="btn btn-success btn-sm" title="Public Verify Page" target="_blank">
+                                🛡️
+                            </a>
+                            <form action="{{ url_for('delete_doc', doc_id=doc.doc_id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this document from the active registry?');">
+                                <button type="submit" class="btn btn-danger btn-sm" title="Delete">
+                                    🗑️
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding: 3rem 1rem;">
+        <div style="font-size:3rem; margin-bottom:1rem;">📂</div>
+        <h3 style="color:#fff; margin-bottom:0.5rem;">No documents uploaded yet</h3>
+        <p style="color:var(--dark-muted); font-size:0.9rem; margin-bottom:1.5rem; max-width:400px; margin-left:auto; margin-right:auto;">
+            Start by uploading certificates, diplomas, contracts, or marksheets to compute their SHA-256 hash and anchor them to the blockchain.
+        </p>
+        <a href="{{ url_for('upload') }}" class="btn btn-primary">
+            Upload Your First Document
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

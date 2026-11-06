@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Blockchain Explorer – DOCUTRACE{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div>
+            <h1 style="font-size: 1.85rem; font-weight: 800; color:#fff;">⛓️ DocuTrace Blockchain Explorer</h1>
+            <p style="color: var(--dark-muted); font-size: 0.95rem;">
+                Live cryptographic ledger recording immutable document registrations and proof-of-work consensus.
+            </p>
+        </div>
+        <div>
+            <button id="btn-audit-blockchain" class="btn btn-primary">
+                🛡️ Run Cryptographic Audit
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- AUDIT ALERT BANNER (Updated via JS or initial state) -->
+<div id="blockchain-audit-status" class="alert {% if is_valid %}alert-success{% else %}alert-danger{% endif %}" style="margin-bottom: 1.5rem;">
+    {% if is_valid %}
+        <strong>✓ BLOCKCHAIN INTEGRITY VERIFIED:</strong> {{ validation_message }} (Chain Height: {{ chain|length }} blocks, Proof-of-Work verified).
+    {% else %}
+        <strong>⚠ INTEGRITY ALERT:</strong> {{ validation_message }}
+    {% endif %}
+</div>
+
+<!-- CHAIN METRICS SUMMARY -->
+<div class="stats-grid" style="margin-bottom: 2.5rem;">
+    <div class="stat-card">
+        <div class="stat-icon icon-purple">⛓️</div>
+        <div class="stat-info">
+            <div class="stat-value">{{ chain|length }}</div>
+            <div class="stat-label">Total Chain Height</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon icon-blue">🎯</div>
+        <div class="stat-info">
+            <div class="stat-value">"00"</div>
+            <div class="stat-label">PoW Mining Target</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon icon-green">🔐</div>
+        <div class="stat-info">
+            <div class="stat-value">SHA-256</div>
+            <div class="stat-label">Cryptographic Hash</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon icon-amber">🛡️</div>
+        <div class="stat-info">
+            <div class="stat-value">Immutable</div>
+            <div class="stat-label">Ledger State</div>
+        </div>
+    </div>
+</div>
+
+<!-- BLOCKCHAIN BLOCKS TIMELINE -->
+<div class="blockchain-chain">
+    {% for block in chain %}
+        <div class="block-card">
+            <div class="block-header">
+                <div class="block-number">
+                    <span>Block #{{ block.index }}</span>
+                    {% if block.index == 0 %}
+                        <span class="badge-pill pill-warning" style="margin-left:0.5rem;">GENESIS ROOT</span>
+                    {% else %}
+                        <span class="badge-pill pill-success" style="margin-left:0.5rem;">MINED & VALIDATED</span>
+                    {% endif %}
+                </div>
+                <div style="font-size:0.8rem; color:var(--dark-muted);">
+                    Timestamp: <span style="color:#fff;">{{ block.timestamp }}</span>
+                </div>
+            </div>
+
+            <!-- Block Payload -->
+            <div style="background:rgba(0,0,0,0.25); border-radius:var(--radius-sm); padding:1rem; margin-bottom:1rem; border:1px solid rgba(255,255,255,0.05);">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:0.75rem;">
+                    <div>
+                        <div class="hash-label">Document Title / Payload</div>
+                        <div style="font-weight:700; color:#fff;">{{ block.title }}</div>
+                    </div>
+                    <div>
+                        <div class="hash-label">Tracking ID</div>
+                        {% if block.index == 0 %}
+                            <span style="font-family:var(--font-mono); color:#9ca3af;">GENESIS ROOT BLOCK</span>
+                        {% else %}
+                            <a href="{{ url_for('verify_direct', doc_id=block.doc_id) }}" style="font-family:var(--font-mono); font-weight:700; color:#38bdf8;" target="_blank">
+                                {{ block.doc_id }} ↗
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <div class="hash-label">Recorded By</div>
+                        <div style="color:#e2e8f0; font-size:0.9rem;">{{ block.uploader }}</div>
+                    </div>
+                    <div>
+                        <div class="hash-label">Proof of Work Nonce</div>
+                        <div style="font-family:var(--font-mono); color:#a78bfa; font-weight:700;">{{ block.nonce }} iterations</div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="hash-label">Document SHA-256 Fingerprint (Payload Hash)</div>
+                    <div class="hash-value" style="color:#34d399;">{{ block.doc_hash }}</div>
+                </div>
+            </div>
+
+            <!-- Cryptographic Linkage -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                <div>
+                    <div class="hash-label">Previous Block Hash (Parent Link)</div>
+                    <div class="hash-value" style="color:#94a3b8; font-size:0.775rem;">
+                        {{ block.previous_hash }}
+                    </div>
+                </div>
+                <div>
+                    <div class="hash-label">Current Block Hash (Proof-of-Work Mined)</div>
+                    <div class="hash-value" style="color:#38bdf8; font-size:0.775rem; font-weight:600;">
+                        {{ block.hash }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if not loop.last %}
+            <div class="chain-connector">
+                <span>⬇️ Linked via Cryptographic Hash ⬇️</span>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}

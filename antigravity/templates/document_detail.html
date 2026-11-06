@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}{{ doc.title }} – DOCUTRACE{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 1.5rem;">
+    <a href="{{ url_for('dashboard') }}" style="color:var(--dark-muted); font-size:0.875rem;">← Back to Dashboard</a>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-top:0.35rem;">
+        <div>
+            <h1 style="font-size: 1.85rem; font-weight: 800; color:#fff;">{{ doc.title }}</h1>
+            <div style="display:flex; align-items:center; gap:0.6rem; margin-top:0.25rem;">
+                <span class="badge-pill pill-info">{{ doc.category }}</span>
+                <span class="badge-pill pill-success">✓ Blockchain Verified</span>
+                <span style="color:var(--dark-muted); font-size:0.85rem;">Tracking ID: <strong>{{ doc.doc_id }}</strong></span>
+            </div>
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+            <a href="{{ url_for('download_file', doc_id=doc.doc_id) }}" class="btn btn-secondary">
+                ⬇️ Download Original File
+            </a>
+            <a href="{{ url_for('verify_direct', doc_id=doc.doc_id) }}" class="btn btn-primary" target="_blank">
+                🔍 Public Verification Page
+            </a>
+        </div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns: 1fr 340px; gap: 1.5rem;">
+    <!-- LEFT COLUMN: METADATA & BLOCKCHAIN PROOF -->
+    <div style="display:flex; flex-direction:column; gap:1.5rem;">
+        <!-- METADATA CARD -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">📄 Document Metadata</h2>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1.25rem;">
+                <div>
+                    <div class="hash-label">Unique Tracking ID</div>
+                    <div style="font-weight:700; font-family:var(--font-mono); color:#38bdf8;">{{ doc.doc_id }}</div>
+                </div>
+                <div>
+                    <div class="hash-label">Issuing Authority / Uploader</div>
+                    <div style="font-weight:600; color:#fff;">{{ doc.uploader_username or 'System Root' }}</div>
+                </div>
+                <div>
+                    <div class="hash-label">Original Filename</div>
+                    <div style="font-size:0.9rem; color:#fff;">{{ doc.original_filename }}</div>
+                </div>
+                <div>
+                    <div class="hash-label">File Size & Format</div>
+                    <div style="font-size:0.9rem; color:#fff;">{{ (doc.file_size / 1024)|round(1) }} KB ({{ doc.file_type }})</div>
+                </div>
+                <div>
+                    <div class="hash-label">Registration Timestamp</div>
+                    <div style="font-size:0.9rem; color:#fff;">{{ doc.created_at }}</div>
+                </div>
+                <div>
+                    <div class="hash-label">Integrity Status</div>
+                    <span class="badge-pill pill-success">Active & Authentic</span>
+                </div>
+            </div>
+
+            {% if doc.description %}
+            <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.06);">
+                <div class="hash-label">Notes / Description</div>
+                <div style="font-size:0.9rem; color:#cbd5e1;">{{ doc.description }}</div>
+            </div>
+            {% endif %}
+
+            <!-- SHA-256 FINGERPRINT BOX -->
+            <div style="margin-top:1.25rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div class="hash-label">Cryptographic SHA-256 Digital Fingerprint</div>
+                    <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('{{ doc.sha256_hash }}', this)">
+                        Copy Hash
+                    </button>
+                </div>
+                <div class="hash-display-box" style="color:#34d399;">
+                    {{ doc.sha256_hash }}
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOCKCHAIN BLOCK PROOF CARD -->
+        {% if block %}
+        <div class="card" style="border-left: 4px solid var(--secondary);">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <span>⛓️ Blockchain Proof of Authenticity</span>
+                    <span class="badge-pill pill-info">Block #{{ block.index }}</span>
+                </h2>
+                <a href="{{ url_for('blockchain_explorer') }}" style="font-size:0.825rem;">View Full Chain →</a>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0.85rem;">
+                <div>
+                    <div class="hash-label">Block Hash (Mined with Proof of Work)</div>
+                    <div class="hash-value" style="color:#38bdf8;">{{ block.hash }}</div>
+                </div>
+                <div>
+                    <div class="hash-label">Previous Block Hash (Cryptographic Link)</div>
+                    <div class="hash-value" style="color:#94a3b8;">{{ block.previous_hash }}</div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div>
+                        <div class="hash-label">Mined Timestamp (UTC)</div>
+                        <div style="font-size:0.85rem; color:#fff;">{{ block.timestamp }}</div>
+                    </div>
+                    <div>
+                        <div class="hash-label">Proof of Work Nonce</div>
+                        <div style="font-size:0.85rem; font-family:var(--font-mono); color:#a78bfa;">{{ block.nonce }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- RIGHT COLUMN: QR CODE & SHARING -->
+    <div style="display:flex; flex-direction:column; gap:1.5rem;">
+        <div class="card" style="text-align:center;">
+            <div class="card-header" style="justify-content:center;">
+                <h2 class="card-title" style="font-size:1.15rem;">📱 Dynamic QR Code</h2>
+            </div>
+
+            <div style="background:#ffffff; padding:1.25rem; border-radius:var(--radius-md); display:inline-block; margin: 0.5rem auto 1rem auto; box-shadow:0 4px 15px rgba(0,0,0,0.4);">
+                <img src="{{ url_for('static', filename=doc.qr_code_path) }}" alt="Document Verification QR Code" style="width:200px; height:200px; display:block;">
+            </div>
+
+            <div style="font-size:0.8rem; color:var(--dark-muted); margin-bottom:1.25rem;">
+                Scan with any smartphone camera to instantly verify authenticity.
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                <a href="{{ url_for('download_qr', doc_id=doc.doc_id) }}" class="btn btn-secondary btn-block">
+                    ⬇️ Download QR Code (PNG)
+                </a>
+                <button class="btn btn-secondary btn-block" onclick="copyToClipboard('{{ request.host_url.rstrip('/') }}/verify/{{ doc.doc_id }}', this)">
+                    📋 Copy Public Verify Link
+                </button>
+            </div>
+        </div>
+
+        <div class="card" style="background:rgba(17,24,39,0.5);">
+            <div style="font-weight:700; color:#fff; font-size:0.95rem; margin-bottom:0.4rem;">💡 Verification Tip</div>
+            <p style="font-size:0.825rem; color:var(--dark-muted); line-height:1.5;">
+                You can print this QR code directly onto the certificate, degree, or contract. Anyone inspecting the document can scan the code to view the live verification result directly from the blockchain.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

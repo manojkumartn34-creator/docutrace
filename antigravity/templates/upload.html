@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Upload & Register Document – DOCUTRACE{% endblock %}
+
+{% block content %}
+<div class="container-narrow" style="max-width: 680px;">
+    <div style="margin-bottom: 1.5rem;">
+        <a href="{{ url_for('dashboard') }}" style="color:var(--dark-muted); font-size:0.875rem;">← Back to Dashboard</a>
+        <h1 style="font-size: 1.85rem; font-weight: 800; color:#fff; margin-top:0.35rem;">
+            Upload & Authenticate Document
+        </h1>
+        <p style="color: var(--dark-muted); font-size: 0.925rem;">
+            Calculate immutable SHA-256 digital fingerprint and mine a proof-of-work block onto the blockchain.
+        </p>
+    </div>
+
+    <div class="card">
+        <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="form-label" for="title">Document Title *</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Bachelor Degree Certificate, Employment Contract, Land Deed" required autofocus>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="category">Category</label>
+                    <select id="category" name="category" class="form-control">
+                        <option value="Academic">🎓 Academic Certificate</option>
+                        <option value="Legal">⚖️ Legal Contract</option>
+                        <option value="Identity">🪪 Identity Document</option>
+                        <option value="Financial">💼 Financial Record</option>
+                        <option value="Medical">🏥 Medical Report</option>
+                        <option value="General" selected>📄 General Document</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="issuer_note">Issuing Authority</label>
+                    <input type="text" class="form-control" value="{{ current_user.username }}" readonly style="opacity: 0.8; cursor: not-allowed;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="description">Document Description / Notes</label>
+                <textarea id="description" name="description" class="form-control" rows="3" placeholder="Optional details, recipient name, graduation year, or tracking reference..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Digital Document File (PDF, Image, Word, CSV) *</label>
+                <div class="dropzone" id="upload_dropzone">
+                    <div class="dropzone-icon">📤</div>
+                    <div style="font-weight: 600; color: #fff; margin-bottom: 0.25rem;">
+                        Drag and drop your file here, or click to browse
+                    </div>
+                    <div style="font-size: 0.8rem; color: #9ca3af;">
+                        Supported: PDF, PNG, JPG, JPEG, DOCX, TXT, CSV (Max 32MB)
+                    </div>
+                    <input type="file" id="document_file" name="document" required>
+                </div>
+
+                <!-- Client-Side File Preview -->
+                <div id="upload_preview" class="file-preview" style="display: none;"></div>
+
+                <!-- Client-Side Live SHA-256 Calculation Box -->
+                <div id="upload_hash_preview" style="margin-top: 0.75rem;"></div>
+            </div>
+
+            <div style="background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.25); border-radius: var(--radius-sm); padding: 1rem; margin: 1.5rem 0;">
+                <div style="font-size:0.85rem; font-weight:700; color:#60a5fa; margin-bottom:0.25rem;">
+                    ⚙️ What happens upon submission?
+                </div>
+                <ul style="color:#cbd5e1; font-size:0.8rem; padding-left:1.25rem; line-height:1.6;">
+                    <li>A cryptographic <strong>SHA-256 digest</strong> is calculated for the uploaded file.</li>
+                    <li>A new block is <strong>mined with Proof-of-Work</strong> and appended to the blockchain ledger.</li>
+                    <li>A unique <strong>Tracking ID</strong> and <strong>high-resolution QR code</strong> are generated for instant verification.</li>
+                </ul>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">
+                🚀 Upload, Mine Block & Generate QR Code
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
